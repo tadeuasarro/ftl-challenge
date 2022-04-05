@@ -6,18 +6,20 @@ module Appointments
     end
 
     def call
-      result = Appointment.where('people in (3, 4)')
-
       { json: result, status: :ok }
-    # rescue StandardError => e
-    #   { json: e, status: :bad_request }
+    rescue StandardError => e
+      { json: e, status: :bad_request }
     end
 
     private
 
     attr_reader :params, :people
 
-    def return_range
+    def result
+      Appointment.where("people in (#{range.join(', ')})")
+    end
+
+    def range
       return range_1 if range_1.include?(people)
 
       return range_2 if range_2.include?(people)
